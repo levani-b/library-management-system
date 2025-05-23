@@ -1,0 +1,1 @@
+from .generate_id import generate_student_id_with_uuid
