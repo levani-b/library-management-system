@@ -1,6 +1,5 @@
-from models.person import Person
-from models.student import Student
-from models.librarian import Librarian
+from models import Person, Student, Librarian, Book
+
 from utils.generate_id import generate_student_id_with_uuid
 
 def main():
@@ -95,8 +94,106 @@ def main():
                                       "L999", "regular", "invalid_id")
         except ValueError as e:
             print(f"Invalid employee ID caught: {e}")
+        
+        print("\n=== BOOK TEST ===")
+        
+        
+        book1 = Book("9781234567890", "Python Programming", "John Smith", 
+                    "Programming", 2023, 5)
+        book2 = Book("978-0-123456-78-9", "Data Structures", "Jane Doe", 
+                    "Computer Science", 2022, 3)
+        book3 = Book("9780987654321", "Web Development", "Bob Johnson", 
+                    "Programming", 2024, 2)
+        
+        print(book1)
+        print(book2)
+        print(book3)
+        
+       
+        print(f"\nBook1 available: {book1.is_available()}")
+        print(f"Book1 copies: {book1.copies_available}/{book1.total_copies}")
+        
+       
+        print("\n=== BORROWING TEST ===")
+        print("Borrowing book1...")
+        book1.borrow_copy()
+        print(f"After borrowing: {book1.copies_available}/{book1.total_copies}")
+        
+        print("Borrowing book1 again...")
+        book1.borrow_copy()
+        print(f"After 2nd borrow: {book1.copies_available}/{book1.total_copies}")
+        
+      
+        print("\n=== RETURNING TEST ===")
+        print("Returning book1...")
+        book1.return_copy()
+        print(f"After return: {book1.copies_available}/{book1.total_copies}")
+        
+
+        print("\n=== EDGE CASE TESTS ===")
+        
+        try:
+            for i in range(10): 
+                book3.borrow_copy()
+                print(f"Borrowed copy {i+1}: {book3.copies_available} left")
+        except Exception as e:
+            print(f"Borrowing failed: {e}")
+        
+        
+        try:
+            for i in range(5):
+                book3.return_copy()
+                print(f"Returned copy {i+1}: {book3.copies_available} available")
+        except Exception as e:
+            print(f"Return failed: {e}")
+        
+        print("\n=== SORTING TEST ===")
+        books = [book1, book2, book3]
+        books.sort()
+        print("Books sorted by title:")
+        for book in books:
+            print(f"  {book.title}")
+        
+        
+        print("\n=== EQUALITY TEST ===")
+        book4 = Book("9781234567890", "Different Title", "Different Author", 
+                    "Different Genre", 2020, 1)
+        print(f"book1 == book4 (same ISBN): {book1 == book4}")
+        print(f"book1 == book2 (different ISBN): {book1 == book2}")
+        
+        
+        print("\n=== VALIDATION TESTS ===")
+        
+        try:
+            bad_isbn = Book("invalid-isbn", "Test", "Test", "Test", 2023, 1)
+        except ValueError as e:
+            print(f"Invalid ISBN caught: {e}")
+        
+        try:
+            bad_year = Book("9781111111111", "Test", "Test", "Test", -100, 1)
+        except ValueError as e:
+            print(f"Invalid year caught: {e}")
+            
+        try:
+            empty_title = Book("9782222222222", "", "Test", "Test", 2023, 1)
+        except ValueError as e:
+            print(f"Empty title caught: {e}")
+        
+       
+        print("\n=== PROPERTY CHANGE TESTS ===")
+        print(f"Original book1 title: {book1.title}")
+        book1.title = "Advanced Python Programming"
+        print(f"New book1 title: {book1.title}")
+        
+        try:
+            book1.copies_available = 10  
+        except ValueError as e:
+            print(f"Invalid available copies caught: {e}")
+            
+
     except ValueError as e:
         print(f'Validation Error: {e}')
+
 
 
 
