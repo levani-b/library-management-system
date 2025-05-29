@@ -6,6 +6,12 @@ class BorrowRecord:
     MAX_FINE = 100.0
 
     def __init__(self, student, book, borrow_date=None, due_days=14):
+        if not hasattr(student, 'full_name'):
+            raise ValueError("Invalid student object")
+        if not hasattr(book, 'title'):
+            raise ValueError("Invalid book object")
+        if due_days <= 0:
+            raise ValueError("Due days must be positive")
         self.__record_id = str(uuid.uuid4())
         self.__student = student
         self.__book = book
@@ -42,6 +48,32 @@ class BorrowRecord:
     def fine_amount(self):
         return self.__fine_amount
 
+    @property
+    def status(self):
+        """Return the current status of the borrow record"""
+        if self.__return_date:
+            return "Returned"
+        elif self.is_overdue():
+            return "Overdue"
+        else:
+            return "Active"
+    
+    @property
+    def days_until_due(self):
+        """Returns days until due (negative if overdue)"""
+        if self.__return_date:
+            return 0
+        today = datetime.today().date()
+        return (self.__due_date - today).days
+
+    @property
+    def days_overdue(self):
+        """Returns number of days overdue (0 if not overdue)"""
+        if not self.is_overdue():
+            return 0
+        today = datetime.today().date()
+        return (today - self.__due_date).days
+
     # --- Mark as returned ---
     def mark_returned(self, return_date=None):
         self.__return_date = return_date or datetime.today().date()
@@ -62,11 +94,38 @@ class BorrowRecord:
 
     # --- Static config ---
     @staticmethod
+    def validate_fine_settings(fine_per_day, max_fine):
+        """Validate fine configuration before setting"""
+        if fine_per_day < 0:
+            raise ValueError("Fine per day cannot be negative")
+        if max_fine < 0:
+            raise ValueError("Max fine cannot be negative")
+        if max_fine < fine_per_day:
+            raise ValueError("Max fine should be at least equal to daily fine")
+        return True
+
+    @staticmethod
     def set_fine_per_day(amount):
+        BorrowRecord.FINE_PER_DAY = amount
+
+    
+
+    @staticmethod
+    def set_max_fine(cap):
+        BorrowRecord.MAX_FINE = cap
+
+    @staticmethod
+    def set_fine_per_day(amount):
+        if amount < 0:
+            raise ValueError("Fine per day cannot be negative")
         BorrowRecord.FINE_PER_DAY = amount
 
     @staticmethod
     def set_max_fine(cap):
+        if cap < 0:
+            raise ValueError("Max fine cannot be negative")
+        if cap < BorrowRecord.FINE_PER_DAY:
+            raise ValueError("Max fine cannot be less than daily fine")
         BorrowRecord.MAX_FINE = cap
 
     def __str__(self):
@@ -76,3 +135,4 @@ class BorrowRecord:
                 f"Borrowed: {self.borrow_date}, Due: {self.due_date}, "
                 f"Returned: {self.return_date or 'Not returned'}, "
                 f"Fine: {self.fine_amount})")
+    
