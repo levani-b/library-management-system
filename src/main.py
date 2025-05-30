@@ -1,22 +1,22 @@
 from models import Person, Student, Librarian, Book
-
-from utils.generate_id import generate_student_id_with_uuid
+from utils.generate_id import generate_person_id, generate_student_id, generate_librarian_id
 
 def main():
     try:
-        
-        person1 = Person("John", "Doe", "john@email.com", "+1234567890", "P001")
+        # Create a regular person
+        person_id = generate_person_id()
+        person1 = Person("John", "Doe", "john@email.com", "+1234567890", person_id)
         print("--- PERSON ---")
         print(person1)
         print(f"Full name: {person1.full_name}")
 
-        
-        student_id = generate_student_id_with_uuid(2024)
+        # Create a student
+        student_id = generate_student_id()
         student1 = Student("Alice", "Smith", "alice@email.com", "+1987654321", 
-                          "S001", "Computer Science", 2, student_id)
+                          student_id, "Computer Science", 2)
         
         print("--- STUDENT ---")
-        print(f"Student ID: {student1.student_id}")
+        print(student1)
         print(f"Major: {student1.major}")
         print(f"Year: {student1.year}")
         print(f"Borrowed books: {student1.borrowed_books}")
@@ -28,76 +28,68 @@ def main():
         student1.add_to_history("Borrowed Python Programming on 2024-01-15")
         print(f"History: {student1.borrowing_history}") 
 
-
-
+        # Create librarians with different access levels
+        librarian_id1 = generate_librarian_id()
         librarian1 = Librarian("Bob", "Wilson", "bob@library.com", "+1555123456", 
-                              "L001", "regular", "LB1001")
+                              librarian_id1, "regular")
         print(librarian1)
         
-        
+        librarian_id2 = generate_librarian_id()
         librarian2 = Librarian("Sarah", "Johnson", "sarah@library.com", "+1555987654",
-                              "L002", "admin", "LB1002")
+                              librarian_id2, "admin")
         print(librarian2)
         
-        
+        librarian_id3 = generate_librarian_id()
         librarian3 = Librarian("Mike", "Davis", "mike@library.com", "+1555456789",
-                              "L003", "super_admin", "LB1003")
+                              librarian_id3, "super_admin")
         print(librarian3)
-        
         
         print("\n=== PERMISSION TESTS ===")
         
-       
+        # Test regular librarian permissions
         try:
             librarian1.add_book("New Python Book")
         except PermissionError as e:
             print(f"Regular librarian denied: {e}")
         
-        
+        # Test admin permissions
         try:
             librarian2.add_book("Advanced Algorithms")
         except PermissionError as e:
             print(f"Admin denied: {e}")
         
-       
+        # Test super_admin permissions
         try:
             librarian3.add_book("Database Design")
         except PermissionError as e:
             print(f"Super admin denied: {e}")
         
-
+        # Test user removal permissions
         try:
-            librarian1.remove_user("S001") 
+            librarian1.remove_user(student_id) 
         except PermissionError as e:
             print(f"Regular librarian can't remove: {e}")
             
         try:
-            librarian2.remove_user("S001")  
+            librarian2.remove_user(student_id)  
         except PermissionError as e:
             print(f"Admin can't remove: {e}")
             
         try:
-            librarian3.remove_user("S001")  
+            librarian3.remove_user(student_id)  
         except PermissionError as e:
             print(f"Super admin denied: {e}")
         
-      
         print("\n=== VALIDATION TESTS ===")
         try:
             bad_librarian = Librarian("Test", "User", "test@test.com", "+1234567890",
-                                    "L999", "invalid_level", "LB9999")
+                                    generate_librarian_id(), "invalid_level")
         except ValueError as e:
             print(f"Invalid access level caught: {e}")
-            
-        try:
-            bad_employee_id = Librarian("Test", "User", "test@test.com", "+1234567890",
-                                      "L999", "regular", "invalid_id")
-        except ValueError as e:
-            print(f"Invalid employee ID caught: {e}")
         
         print("\n=== BOOK TEST ===")
         
-        
+        # Create some books
         book1 = Book("9781234567890", "Python Programming", "John Smith", 
                     "Programming", 2023, 5)
         book2 = Book("978-0-123456-78-9", "Data Structures", "Jane Doe", 
@@ -109,11 +101,11 @@ def main():
         print(book2)
         print(book3)
         
-       
+        # Test book availability
         print(f"\nBook1 available: {book1.is_available()}")
         print(f"Book1 copies: {book1.copies_available}/{book1.total_copies}")
         
-       
+        # Test borrowing
         print("\n=== BORROWING TEST ===")
         print("Borrowing book1...")
         book1.borrow_copy()
@@ -123,13 +115,13 @@ def main():
         book1.borrow_copy()
         print(f"After 2nd borrow: {book1.copies_available}/{book1.total_copies}")
         
-      
+        # Test returning
         print("\n=== RETURNING TEST ===")
         print("Returning book1...")
         book1.return_copy()
         print(f"After return: {book1.copies_available}/{book1.total_copies}")
         
-
+        # Test edge cases
         print("\n=== EDGE CASE TESTS ===")
         
         try:
@@ -138,7 +130,6 @@ def main():
                 print(f"Borrowed copy {i+1}: {book3.copies_available} left")
         except Exception as e:
             print(f"Borrowing failed: {e}")
-        
         
         try:
             for i in range(5):
@@ -154,13 +145,11 @@ def main():
         for book in books:
             print(f"  {book.title}")
         
-        
         print("\n=== EQUALITY TEST ===")
         book4 = Book("9781234567890", "Different Title", "Different Author", 
                     "Different Genre", 2020, 1)
         print(f"book1 == book4 (same ISBN): {book1 == book4}")
         print(f"book1 == book2 (different ISBN): {book1 == book2}")
-        
         
         print("\n=== VALIDATION TESTS ===")
         
@@ -179,17 +168,10 @@ def main():
         except ValueError as e:
             print(f"Empty title caught: {e}")
         
-       
         print("\n=== PROPERTY CHANGE TESTS ===")
         print(f"Original book1 title: {book1.title}")
         book1.title = "Advanced Python Programming"
         print(f"New book1 title: {book1.title}")
-        
-        try:
-            book1.copies_available = 10  
-        except ValueError as e:
-            print(f"Invalid available copies caught: {e}")
-            
 
     except ValueError as e:
         print(f'Validation Error: {e}')
