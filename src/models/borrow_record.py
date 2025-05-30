@@ -106,16 +106,6 @@ class BorrowRecord:
 
     @staticmethod
     def set_fine_per_day(amount):
-        BorrowRecord.FINE_PER_DAY = amount
-
-    
-
-    @staticmethod
-    def set_max_fine(cap):
-        BorrowRecord.MAX_FINE = cap
-
-    @staticmethod
-    def set_fine_per_day(amount):
         if amount < 0:
             raise ValueError("Fine per day cannot be negative")
         BorrowRecord.FINE_PER_DAY = amount

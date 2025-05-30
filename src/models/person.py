@@ -42,7 +42,7 @@ class Person:
     
     @email.setter
     def email(self, value):
-        if not re.match(r"^\+?[\d\s\-\(\)]{7,15}$", value.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")):
+        if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", value):
             raise ValueError("Invalid email format")
         self.__email = value
     

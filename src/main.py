@@ -105,21 +105,23 @@ def main():
         print(f"\nBook1 available: {book1.is_available()}")
         print(f"Book1 copies: {book1.copies_available}/{book1.total_copies}")
         
-        # Test borrowing
-        print("\n=== BORROWING TEST ===")
-        print("Borrowing book1...")
-        book1.borrow_copy()
-        print(f"After borrowing: {book1.copies_available}/{book1.total_copies}")
+        # Test student borrowing
+        print("\n=== STUDENT BORROWING TEST ===")
+        student1.add_borrowed_book(book1)
+        student1.add_borrowed_book(book2)
+        print(f"Student borrowed books: {[book.title for book in student1.borrowed_books]}")
         
-        print("Borrowing book1 again...")
+        student1.add_to_history(f"Borrowed {book1.title} on 2024-01-15")
+        print(f"History: {student1.borrowing_history}")
+        
+        # Test book availability after borrowing
         book1.borrow_copy()
-        print(f"After 2nd borrow: {book1.copies_available}/{book1.total_copies}")
+        print(f"Book1 after student borrow: {book1.copies_available}/{book1.total_copies}")
         
         # Test returning
-        print("\n=== RETURNING TEST ===")
-        print("Returning book1...")
+        student1.remove_borrowed_book(book1)
         book1.return_copy()
-        print(f"After return: {book1.copies_available}/{book1.total_copies}")
+        print(f"Book1 after return: {book1.copies_available}/{book1.total_copies}")
         
         # Test edge cases
         print("\n=== EDGE CASE TESTS ===")

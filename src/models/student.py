@@ -45,7 +45,9 @@ class Student(Person):
     
     def remove_borrowed_book(self, book):
         if len(self.__borrowed_books) <= 0:
-            return "There are not borrowed books"
+            raise ValueError("No borrowed books to remove")
+        if book not in self.__borrowed_books:
+            raise ValueError("Book not in borrowed list")
         self.__borrowed_books.remove(book)
 
     def add_to_history(self, record):
