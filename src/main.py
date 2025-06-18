@@ -2,71 +2,57 @@ from models.person import Person
 from models.student import Student
 from models.librarian import Librarian, AccessLevel
 from utils.generate_id import generate_id
+from models.book import Book
+from models.borrow_record import BorrowRecord
+from datetime import date, timedelta
 
 def main():
-    person1 = Person("john", "doe", generate_id("john", "doe"), "john.doe@gmail.com")
-    person2 = Person("jane", "smith", generate_id("jane", "smith"), "jane.smith@yahoo.com")
-    
-    print(person1)
-    print(person2)
-    print(person1 == person2)
-    
-    student1 = Student("harry", "potter", generate_id("harry", "potter"), 
-                      "harry.potter@hogwarts.edu", "Magic", 3)
-    student2 = Student("hermione", "granger", generate_id("hermione", "granger"), 
-                      "hermione.granger@hogwarts.edu", "Magic", 3)
-    
-    print(student1)
-    print(student2)
-    print(student1.major)
-    print(student2.year)
-    
-    student1.year = 4
-    student2.major = "Advanced Magic"
-    
-    print(student1)
-    print(student2)
+    # Create a student
+    student = Student(
+        name="Harry",
+        surname="Potter",
+        id=generate_id(name="Harry", surname="Potter"),
+        email="harry.potter@hogwarts.edu",
+        major="Magic",
+        year=3
+    )
 
-    librarian1 = Librarian("minerva", "mcgonagall", generate_id("minerva", "mcgonagall"),
-                          "minerva.mcgonagall@hogwarts.edu", AccessLevel.SUPER_ADMIN.value)
-    librarian2 = Librarian("madam", "pince", generate_id("madam", "pince"),
-                          "madam.pince@hogwarts.edu", AccessLevel.REGULAR.value)
-    
-    print("\nLibrarian Information:")
-    print(librarian1)
-    print(librarian2)
-    
-    print("\nPermission Checks:")
-    print(f"Can {librarian1.name} manage librarians? {librarian1.has_permission('manage_librarians')}")
-    print(f"Can {librarian2.name} manage librarians? {librarian2.has_permission('manage_librarians')}")
-    
-    print("\nChanging Madam Pince's access level to admin:")
-    librarian2.access_level = AccessLevel.ADMIN.value
-    print(f"Can {librarian2.name} manage books? {librarian2.has_permission('manage_books')}")
-    print(f"Can {librarian2.name} manage students? {librarian2.has_permission('manage_students')}")
-    print(f"Can {librarian2.name} manage librarians? {librarian2.has_permission('manage_librarians')}")
-    print(f"Can {librarian2.name} process transactions? {librarian2.has_permission('process_transactions')}")
-    
-    print("\nAccess Level Checks:")
-    print(f"Is {librarian1.name} regular? {librarian1.is_regular()}")
-    print(f"Is {librarian1.name} admin? {librarian1.is_admin()}")
-    print(f"Is {librarian1.name} super admin? {librarian1.is_super_admin()}")
-    
-    print(f"\nIs {librarian2.name} regular? {librarian2.is_regular()}")
-    print(f"Is {librarian2.name} admin? {librarian2.is_admin()}")
-    print(f"Is {librarian2.name} super admin? {librarian2.is_super_admin()}")
-    
-    print("\nTrying to set invalid access level:")
-    try:
-        librarian2.access_level = "invalid_level"
-    except ValueError as e:
-        print(f"Error: {e}")
-    
-    print("\nTrying to check invalid permission:")
-    try:
-        librarian1.has_permission("invalid_action")
-    except ValueError as e:
-        print(f"Error: {e}")
+    # Create a book
+    book = Book(
+        title="Advanced Potion Making",
+        author="Libatius Borage",
+        isbn="9876543210",
+        genre="Magic",
+        publication_year=1946,
+        copies_available=1,
+        total_copies=1
+    )
+
+    # Simulate borrowing the book
+    borrow_date = date.today()
+    due_date = borrow_date + timedelta(days=14)
+
+    # Create a borrow record
+    record = BorrowRecord(
+        student=student,
+        book=book,
+        borrow_date=borrow_date,
+        due_date=due_date
+    )
+
+    print("Student:", student)
+    print("Book:", book)
+    print("Borrow Record:", record)
+
+    # Simulate returning the book late
+    return_date = due_date + timedelta(days=5)
+    record.mark_returned(return_date)
+
+    print("\nAfter returning the book late:")
+    print("Borrow Record:", record)
+    print("Is overdue?", record.is_overdue())
+    print("Days overdue:", record.days_overdue())
+    print("Fine amount:", record.fine_amount)
 
 if __name__ == "__main__":
     main()
