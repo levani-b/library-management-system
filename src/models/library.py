@@ -4,7 +4,7 @@ from models.book import Book
 from models.borrow_record import BorrowRecord
 
 class Library:
-    def __init__(self,name):
+    def __init__(self, name):
         self.__name = self.__validate_name(name)
         self.__books = {}
         self.__students = {}
@@ -97,7 +97,6 @@ class Library:
             raise ValueError(f"Book '{book.title}' is not available for borrowing.")
         if book in student.borrowed_books:
             raise ValueError(f"Student already borrowed this book.")
-        
         book.borrow_copy()
         student.borrow_book(book)
         record = BorrowRecord(student, book, borrow_date, due_date)
@@ -139,47 +138,6 @@ class Library:
         overdue = self.get_overdue_books()
         report.append(f"Overdue Books: {len(overdue)}")
         return "\n".join(report)
-
-    def save_data(self, books_file, students_file, records_file):
-        from utils.file_handler import save_json
-        books_list = []
-        for book in self.__books.values():
-            books_list.append(self._serialize_book(book))
-        save_json(books_file, books_list)
-
-        students_list = []
-        for student in self.__students.values():
-            students_list.append(self._serialize_student(student))
-        save_json(students_file, students_list)
-
-        records_list = []
-        for record in self.__borrow_records:
-            records_list.append(self._serialize_borrow_record(record))
-        save_json(records_file, records_list)
-
-    def load_data(self, books_file, students_file, records_file):
-        from utils.file_handler import load_json
-        from models.book import Book
-        from models.student import Student
-        from models.borrow_record import BorrowRecord
-        books_data = load_json(books_file)
-        students_data = load_json(students_file)
-        records_data = load_json(records_file)
-
-        self.__books = {}
-        for b in books_data:
-            book = Book(**b)
-            self.__books[book.isbn] = book
-
-        self.__students = {}
-        for s in students_data:
-            student = Student(**s)
-            self.__students[student.person_id] = student
-
-        self.__borrow_records = []
-        for r in records_data:
-            record = BorrowRecord(**r)
-            self.__borrow_records.append(record)
 
     def _serialize_book(self, book):
         return {
