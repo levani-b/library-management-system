@@ -1,6 +1,6 @@
 # Library Management System
 
-library management system with a user-friendly GUI for managing books, students, librarians, and borrowing operations.
+A Python-based desktop application with GUI for managing library operations including books, students, librarians, and borrowing activities.
 
 ## Features
 
