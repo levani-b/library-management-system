@@ -5,54 +5,64 @@ from utils.generate_id import generate_id
 from models.book import Book
 from models.borrow_record import BorrowRecord
 from datetime import date, timedelta
+from models.library import Library
 
 def main():
-    # Create a student
-    student = Student(
-        name="Harry",
-        surname="Potter",
-        id=generate_id(name="Harry", surname="Potter"),
-        email="harry.potter@hogwarts.edu",
-        major="Magic",
-        year=3
-    )
+    # 1. Create a library instance
+    library = Library("Central Library")
+    print(f"Created library: {library.name}")
 
-    # Create a book
-    book = Book(
-        title="Advanced Potion Making",
-        author="Libatius Borage",
-        isbn="9876543210",
-        genre="Magic",
-        publication_year=1946,
-        copies_available=1,
-        total_copies=1
+    # 2. Create and add a book
+    book1 = Book(
+        title="Harry Potter and the Philosopher's Stone",
+        author="J.K. Rowling",
+        isbn="9780747532699",
+        genre="Fantasy",
+        publication_year=1997,
+        copies_available=3,
+        total_copies=3
     )
+    library.add_book(book1)
+    print(f"Added book: {book1.title}")
 
-    # Simulate borrowing the book
+    # 3. Register a student
+    student1 = Student(
+        name="John",
+        surname="Doe",
+        id="S001",
+        email="john.doe@example.com",
+        major="Computer Science",
+        year=2
+    )
+    library.register_student(student1)
+    print(f"Registered student: {student1.name} {student1.surname}")
+
+    # 4. Register a librarian
+    librarian1 = Librarian(
+        name="Jane",
+        surname="Smith",
+        id="L001",
+        email="jane.smith@example.com",
+        access_level=AccessLevel.ADMIN.value
+    )
+    library.register_librarian(librarian1)
+    print(f"Registered librarian: {librarian1.name} {librarian1.surname}")
+
+    # 5. Borrow a book
     borrow_date = date.today()
     due_date = borrow_date + timedelta(days=14)
+    record = library.borrow_book(student_id=student1.person_id, isbn=book1.isbn, borrow_date=borrow_date, due_date=due_date)
+    print(f"{student1.name} borrowed '{book1.title}' on {borrow_date}")
 
-    # Create a borrow record
-    record = BorrowRecord(
-        student=student,
-        book=book,
-        borrow_date=borrow_date,
-        due_date=due_date
-    )
+    # 6. Return the book
+    return_date = borrow_date + timedelta(days=16) 
+    library.return_book(student_id=student1.person_id, isbn=book1.isbn, return_date=return_date)
+    print(f"{student1.name} returned '{book1.title}' on {return_date}")
 
-    print("Student:", student)
-    print("Book:", book)
-    print("Borrow Record:", record)
-
-    # Simulate returning the book late
-    return_date = due_date + timedelta(days=5)
-    record.mark_returned(return_date)
-
-    print("\nAfter returning the book late:")
-    print("Borrow Record:", record)
-    print("Is overdue?", record.is_overdue())
-    print("Days overdue:", record.days_overdue())
-    print("Fine amount:", record.fine_amount)
+    # 7. Generate and print a report
+    report = library.generate_report()
+    print("\nLibrary Report:")
+    print(report)
 
 if __name__ == "__main__":
     main()
